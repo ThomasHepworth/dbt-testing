@@ -1,0 +1,59 @@
+iceberg:
+  outputs:
+    default_settings:
+      catalog: awsdatacatalog
+      region_name: eu-west-1
+      s3_data_dir: s3://alpha-mojap-ccde/iceberg-testing/
+      s3_data_naming: schema_table
+      s3_staging_dir: s3://dbt-query-dump
+      schema: iceberg_testing
+      type: athena
+    dev:
+      catalog: awsdatacatalog
+      num_retries: 2
+      region_name: eu-west-1
+      s3_data_dir: s3://alpha-mojap-ccde/iceberg-testing/
+      s3_data_naming: schema_table
+      s3_staging_dir: s3://dbt-query-dump
+      schema: iceberg_testing
+      threads: 5
+      type: athena
+      work_group: "{{ env_var('DBT_DEV_PROFILE_WORKGROUP', 'primary') }}"
+    prod:
+      catalog: awsdatacatalog
+      num_retries: 3
+      region_name: eu-west-1
+      s3_data_dir: s3://alpha-mojap-ccde/iceberg-testing/
+      s3_data_naming: schema_table
+      s3_staging_dir: s3://dbt-query-dump
+      schema: iceberg_testing
+      threads: 100
+      type: athena
+      work_group: "{{ env_var('DBT_PROD_PROFILE_WORKGROUP', 'primary') }}"
+  target: dev
+
+transpile_sql:
+  outputs:
+    dev:
+      database: awsdatacatalog
+      region_name: eu-west-1
+      s3_data_dir: s3://alpha-mojap-ccde/transpile-sql
+      s3_staging_dir: s3://dbt-query-dump
+      schema: transpile
+      threads: 5
+      type: athena
+  target: dev
+
+duckdb_transpile:
+  outputs:
+    dev:
+      type: duckdb
+      path: './duckdb_testing.duckdb'
+      extensions:
+        - httpfs
+        - parquet
+      # settings:
+      #   s3_region: eu-west-1
+      #   s3_access_key_id: "{{ env_var('S3_ACCESS_KEY_ID') }}"
+      #   s3_secret_access_key: "{{ env_var('S3_SECRET_ACCESS_KEY') }}"
+  target: dev
